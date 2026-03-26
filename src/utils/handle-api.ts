@@ -3,13 +3,13 @@ import React from 'react';
 
 const baseURL = 'https://todo-app-express-backend-rtbt.onrender.com';
 
-export interface TaskItem {
+export interface FetchedTaskItem {
   _id: string;
   text: string;
 }
 
-export const getAllTasks = (setTasks: React.Dispatch<React.SetStateAction<TaskItem[]>>) => {
-  axios.get<TaskItem[]>(`${baseURL}`).then(({ data }) => {
+export const getAllTasks = (setTasks: React.Dispatch<React.SetStateAction<FetchedTaskItem[]>>) => {
+  axios.get<FetchedTaskItem[]>(`${baseURL}`).then(({ data }) => {
     setTasks(data);
   }).catch((err) => console.log(err));
 };
@@ -17,7 +17,7 @@ export const getAllTasks = (setTasks: React.Dispatch<React.SetStateAction<TaskIt
 export const addTask = (
   text: string,
   setText: React.Dispatch<React.SetStateAction<string>>,
-  setTasks: React.Dispatch<React.SetStateAction<TaskItem[]>>
+  setTasks: React.Dispatch<React.SetStateAction<FetchedTaskItem[]>>
 ) => {
   axios
     .post(`${baseURL}/save`, { text })
@@ -31,7 +31,7 @@ export const addTask = (
 export const updateTask = (
   taskId: string,
   text: string,
-  setTasks: React.Dispatch<React.SetStateAction<TaskItem[]>>,
+  setTasks: React.Dispatch<React.SetStateAction<FetchedTaskItem[]>>,
   setText: React.Dispatch<React.SetStateAction<string>>,
   setIsUpdating: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
@@ -47,7 +47,7 @@ export const updateTask = (
 
 export const deleteTask = (
   _id: string,
-  setTasks: React.Dispatch<React.SetStateAction<TaskItem[]>>
+  setTasks: React.Dispatch<React.SetStateAction<FetchedTaskItem[]>>
 ) => {
   axios
     .post(`${baseURL}/delete`, { _id })

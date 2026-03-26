@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Platform, StatusBar as RNStatusBar } from 'react-native';
+import { StyleSheet, Text, View, TextInput, SafeAreaView, Platform, StatusBar as RNStatusBar, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Task from './src/components/Task';
-import { addTask, deleteTask, getAllTasks, updateTask, TaskItem } from './src/utils/handle-api';
+import { addTask, deleteTask, getAllTasks, updateTask, FetchedTaskItem } from './src/utils/handle-api';
+import { TaskList } from './src/components/TaskList';
+import { Image } from 'react-native';
 
 export default function App() {
-  const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [tasks, setTasks] = useState<FetchedTaskItem[]>([]);
   const [text, setText] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [taskId, setTaskId] = useState("");
@@ -23,7 +24,12 @@ export default function App() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
+        <Image
+          style={styles.image}
+          source={require('./tasks/images/image.png')}
+        />
         <Text style={styles.header}>Tarefas</Text>
+        <Text style={styles.taskCount}>Quantidade total de tarefas: {tasks.length}</Text>
 
         <View style={styles.top}>
           <TextInput
@@ -31,32 +37,26 @@ export default function App() {
             placeholder="Adicione uma tarefa..."
             value={text}
             onChangeText={(val) => setText(val)}
+            maxLength={90}
+            keyboardType='web-search'
           />
 
-          <TouchableOpacity
-            style={styles.addButton}
+          <Button
+            title={isUpdating ? "Atualizar" : "Adicionar"}
             onPress={
               isUpdating
                 ? () => updateTask(taskId, text, setTasks, setText, setIsUpdating)
                 : () => addTask(text, setText, setTasks)
             }
-          >
-            <Text style={styles.addButtonText}>
-              {isUpdating ? "Atualizar" : "Adicionar"}
-            </Text>
-          </TouchableOpacity>
+          />
         </View>
+        
+        <TaskList
+          tasks={tasks}
+          updateMode={updateMode}
+          deleteToDo={(id) => deleteTask(id, setTasks)}
+        />
 
-        <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
-          {tasks.map((item) => (
-            <Task
-              key={item._id}
-              text={item.text}
-              updateMode={() => updateMode(item._id, item.text)}
-              deleteToDo={() => deleteTask(item._id, setTasks)}
-            />
-          ))}
-        </ScrollView>
       </View>
       <StatusBar style="auto" />
     </SafeAreaView>
@@ -64,6 +64,16 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  taskCount: {
+    marginTop: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 16,
+  },
+  image: {
+    maxHeight: 200,
+    alignSelf: 'center',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
@@ -84,8 +94,8 @@ const styles = StyleSheet.create({
   },
   top: {
     marginTop: 16,
-    flexDirection: 'row',
-    gap: 16,
+    flexDirection: 'column',
+    gap: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -96,6 +106,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#000',
     fontSize: 16,
+    borderRadius: 4,
+    width: 520,
   },
   addButton: {
     backgroundColor: '#000',
